@@ -11,9 +11,20 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="mb-3">
+                <label for="question_type" class="form-label">Typ otázky *</label>
+                <select class="form-select" id="question_type" name="question_type" onchange="toggleTypeFields()">
+                    {% for code, label in question_types.items() %}
+                    <option value="{{ code }}"
+                        {{ 'selected' if question and question.question_type == code }}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
                 <label for="text" class="form-label">Text otázky *</label>
-                <input type="text" class="form-control form-control-lg" id="text" name="text"
-                       value="{{ question.text if question else '' }}" required>
+                <textarea class="form-control" id="text" name="text" rows="2" required>{{ question.text if question else '' }}</textarea>
+                <small class="text-muted" id="textHint">Pro typ "Doplňování" použijte ____ pro mezeru k vyplnění.</small>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
@@ -23,14 +34,93 @@
         </div>
     </div>
 
-    <h4 class="mb-3">Odpovědi a bodování</h4>
-    <div id="answersContainer">
-        <!-- Dynamicky naplneno JS -->
+    <!-- ═══════ SEKCE: Odpovědi (single/multiple/true_false/likert) ═══════ -->
+    <div id="section_answers" class="type-section">
+        <h4 class="mb-3">Odpovědi a bodování</h4>
+        <div id="answersContainer"></div>
+        <button type="button" class="btn btn-outline-primary mb-4" onclick="addAnswer()">
+            <i class="bi bi-plus-lg"></i> Přidat odpověď
+        </button>
     </div>
 
-    <button type="button" class="btn btn-outline-primary mb-4" onclick="addAnswer()">
-        <i class="bi bi-plus-lg"></i> Přidat odpověď
-    </button>
+    <!-- ═══════ SEKCE: Likert labels ═══════ -->
+    <div id="section_likert" class="type-section" style="display:none">
+        <div class="card mb-4">
+            <div class="card-header">Likert škála – popisky</div>
+            <div class="card-body">
+                <label class="form-label">Popisky (oddělené čárkou)</label>
+                <input type="text" class="form-control" name="likert_labels"
+                       value="{{ question.extra_data_parsed.labels | join(', ') if question and question.extra_data_parsed.labels else 'Vůbec ne, Spíše ne, Neutrálně, Spíše ano, Rozhodně ano' }}">
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ SEKCE: Matching ═══════ -->
+    <div id="section_matching" class="type-section" style="display:none">
+        <h4 class="mb-3">Párování</h4>
+        <div id="matchingContainer"></div>
+        <button type="button" class="btn btn-outline-primary mb-4" onclick="addMatch()">
+            <i class="bi bi-plus-lg"></i> Přidat pár
+        </button>
+    </div>
+
+    <!-- ═══════ SEKCE: Ordering ═══════ -->
+    <div id="section_ordering" class="type-section" style="display:none">
+        <div class="card mb-4">
+            <div class="card-header">Seřazování</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Položky (každá na novém řádku, ve správném pořadí)</label>
+                    <textarea class="form-control" name="order_items" rows="5">{% if question and question.extra_data_parsed.items %}{% for item in question.extra_data_parsed.items %}{{ item }}
+{% endfor %}{% endif %}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bodování za správnou pozici (formát: ID_kategorie:body)</label>
+                    <input type="text" class="form-control" name="order_scores"
+                           value="{% if question and question.extra_data_parsed.scores %}{% for k,v in question.extra_data_parsed.scores.items() %}{{ k }}:{{ v }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}"
+                           placeholder="1:2, 5:1">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ SEKCE: Short Answer ═══════ -->
+    <div id="section_short_answer" class="type-section" style="display:none">
+        <h4 class="mb-3">Klíčová slova</h4>
+        <div id="keywordsContainer"></div>
+        <button type="button" class="btn btn-outline-primary mb-4" onclick="addKeywordGroup()">
+            <i class="bi bi-plus-lg"></i> Přidat skupinu klíčových slov
+        </button>
+    </div>
+
+    <!-- ═══════ SEKCE: Fill Blank ═══════ -->
+    <div id="section_fill_blank" class="type-section" style="display:none">
+        <div class="card mb-4">
+            <div class="card-header">Doplňování</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Přijímané odpovědi (oddělené čárkou)</label>
+                    <input type="text" class="form-control" name="fill_accepted"
+                           value="{% if question and question.extra_data_parsed.accepted %}{{ question.extra_data_parsed.accepted | join(', ') }}{% endif %}"
+                           placeholder="architekt, projektant">
+                </div>
+                <label class="form-label small text-muted">Bodování za správnou odpověď:</label>
+                <div class="row">
+                    {% for cat in categories %}
+                    <div class="col-md-4 col-lg-3 mb-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text" title="{{ cat.name }}">{{ cat.icon }}</span>
+                            <input type="number" class="form-control"
+                                   name="fill_correct_score_{{ cat.id }}"
+                                   value="{{ question.extra_data_parsed.correct_scores.get(cat.id|string, 0) if question and question.extra_data_parsed.correct_scores else 0 }}"
+                                   min="0" max="5">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="d-flex gap-2 mb-5">
         <button type="submit" class="btn btn-success btn-lg">
@@ -43,14 +133,47 @@
 
 {% block scripts %}
 <script>
-let answerCount = 0;
-
+// Data kategorií
 const cats = [
     {% for cat in categories %}
     {id: {{ cat.id }}, name: "{{ cat.name }}", icon: "{{ cat.icon }}"},
     {% endfor %}
 ];
 
+let answerCount = 0;
+let matchCount = 0;
+let keywordCount = 0;
+
+// ═══════ TOGGLE TYPE SECTIONS ═══════
+function toggleTypeFields() {
+    const type = document.getElementById('question_type').value;
+    document.querySelectorAll('.type-section').forEach(s => s.style.display = 'none');
+
+    if (['single_choice', 'multiple_choice', 'true_false', 'likert'].includes(type)) {
+        document.getElementById('section_answers').style.display = 'block';
+    }
+    if (type === 'likert') {
+        document.getElementById('section_likert').style.display = 'block';
+    }
+    if (type === 'matching') {
+        document.getElementById('section_matching').style.display = 'block';
+    }
+    if (type === 'ordering') {
+        document.getElementById('section_ordering').style.display = 'block';
+    }
+    if (type === 'short_answer') {
+        document.getElementById('section_short_answer').style.display = 'block';
+    }
+    if (type === 'fill_blank') {
+        document.getElementById('section_fill_blank').style.display = 'block';
+    }
+
+    // Text hint
+    const hint = document.getElementById('textHint');
+    hint.style.display = type === 'fill_blank' ? 'block' : 'none';
+}
+
+// ═══════ ANSWERS ═══════
 function addAnswer(text = '', scores = {}) {
     const idx = answerCount++;
     const container = document.getElementById('answersContainer');
@@ -74,7 +197,7 @@ function addAnswer(text = '', scores = {}) {
     card.innerHTML = `
         <div class="card-header d-flex justify-content-between align-items-center">
             <strong>Odpověď ${idx + 1}</strong>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAnswer(${idx})">
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="document.getElementById('answer_${idx}').remove()">
                 <i class="bi bi-trash"></i>
             </button>
         </div>
@@ -90,19 +213,121 @@ function addAnswer(text = '', scores = {}) {
     container.appendChild(card);
 }
 
-function removeAnswer(idx) {
-    const el = document.getElementById(`answer_${idx}`);
-    if (el) el.remove();
+// ═══════ MATCHING ═══════
+function addMatch(left = '', right = '', scores = {}) {
+    const idx = matchCount++;
+    const container = document.getElementById('matchingContainer');
+    const card = document.createElement('div');
+    card.className = 'card mb-3';
+    card.id = `match_${idx}`;
+
+    let scoresHTML = '';
+    cats.forEach(cat => {
+        const val = scores[cat.id] || scores[String(cat.id)] || 0;
+        scoresHTML += `
+            <div class="col-md-4 col-lg-3 mb-2">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" title="${cat.name}">${cat.icon}</span>
+                    <input type="number" class="form-control" name="match_${idx}_score_${cat.id}"
+                           value="${val}" min="0" max="5">
+                </div>
+            </div>`;
+    });
+
+    card.innerHTML = `
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Pár ${idx + 1}</strong>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="document.getElementById('match_${idx}').remove()">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="match_${idx}_left"
+                           value="${left}" placeholder="Levá strana" required>
+                </div>
+                <div class="col-md-2 text-center align-self-center">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="match_${idx}_right"
+                           value="${right}" placeholder="Pravá strana" required>
+                </div>
+            </div>
+            <label class="form-label small text-muted">Bodování za správný pár:</label>
+            <div class="row">${scoresHTML}</div>
+        </div>`;
+
+    container.appendChild(card);
 }
 
-// Naplneni existujicich odpovedi nebo vytvoreni 4 prazdnych
+// ═══════ KEYWORDS ═══════
+function addKeywordGroup(keywords = '', scores = {}) {
+    const idx = keywordCount++;
+    const container = document.getElementById('keywordsContainer');
+    const card = document.createElement('div');
+    card.className = 'card mb-3';
+    card.id = `keyword_${idx}`;
+
+    let scoresHTML = '';
+    cats.forEach(cat => {
+        const val = scores[cat.id] || scores[String(cat.id)] || 0;
+        scoresHTML += `
+            <div class="col-md-4 col-lg-3 mb-2">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" title="${cat.name}">${cat.icon}</span>
+                    <input type="number" class="form-control" name="keyword_${idx}_score_${cat.id}"
+                           value="${val}" min="0" max="5">
+                </div>
+            </div>`;
+    });
+
+    card.innerHTML = `
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Skupina ${idx + 1}</strong>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="document.getElementById('keyword_${idx}').remove()">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Klíčová slova (oddělená čárkou)</label>
+                <input type="text" class="form-control" name="keyword_${idx}_words"
+                       value="${keywords}" placeholder="programátor, developer, vývojář">
+            </div>
+            <label class="form-label small text-muted">Bodování při shodě:</label>
+            <div class="row">${scoresHTML}</div>
+        </div>`;
+
+    container.appendChild(card);
+}
+
+// ═══════ INICIALIZACE ═══════
 document.addEventListener('DOMContentLoaded', function() {
+    toggleTypeFields();
+
+    // Naplnění existujících odpovědí
     {% if answers_data %}
         {% for a in answers_data %}
         addAnswer("{{ a.text | e }}", {{ a.scores | tojson }});
         {% endfor %}
-    {% else %}
+    {% elif not question %}
         for (let i = 0; i < 4; i++) addAnswer();
+    {% endif %}
+
+    // Naplnění existujících matching párů
+    {% if question and question.question_type == 'matching' and question.extra_data_parsed.pairs %}
+        {% for pair in question.extra_data_parsed.pairs %}
+        addMatch("{{ pair.left | e }}", "{{ pair.right | e }}", {{ pair.scores | tojson }});
+        {% endfor %}
+    {% endif %}
+
+    // Naplnění keyword groups
+    {% if question and question.question_type == 'short_answer' and question.extra_data_parsed.keyword_groups %}
+        {% for kg in question.extra_data_parsed.keyword_groups %}
+        addKeywordGroup("{{ kg.keywords | join(', ') | e }}", {{ kg.scores | tojson }});
+        {% endfor %}
     {% endif %}
 });
 </script>

@@ -4,10 +4,10 @@
 {% block content %}
 <div class="text-center mb-4">
     <h2><i class="bi bi-trophy-fill text-warning"></i> Výsledky kvízu</h2>
-    <p class="text-muted">Odpověděl/a jsi na {{ answered }} otázek</p>
+    <p class="text-muted">Odpověděl/a jsi na {{ answered }} z {{ total }} otázek</p>
 </div>
 
-<!-- Top 3 vysledky -->
+<!-- Top 3 výsledky -->
 <div class="row g-4 mb-5">
     {% for r in top_results %}
     <div class="col-md-4">
@@ -33,7 +33,7 @@
     {% endfor %}
 </div>
 
-<!-- Kompletni prehled -->
+<!-- Kompletní přehled -->
 <h4 class="mb-3">Kompletní přehled všech kategorií</h4>
 <div class="card">
     <div class="card-body">

@@ -8,28 +8,189 @@
     <div class="progress mb-3" style="height: 8px;">
         <div class="progress-bar bg-primary" id="progressBar" style="width: 0%"></div>
     </div>
-    <small class="text-muted">Otázka <span id="currentQ">1</span> z {{ total }}</small>
+    <small class="text-muted">Zodpovězeno: <span id="answeredCount">0</span> z {{ total }}</small>
 </div>
 
 <form method="POST" action="{{ url_for('submit') }}" id="quizForm">
     {% for question in questions %}
-    <div class="question-card card mb-4" data-question="{{ loop.index }}">
-        <div class="card-header bg-light">
+    <div class="question-card card mb-4" data-question="{{ loop.index }}" data-type="{{ question.question_type }}">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <strong>Otázka {{ loop.index }}/{{ total }}</strong>
+            <span class="badge bg-{{ {
+                'single_choice': 'primary',
+                'multiple_choice': 'info',
+                'true_false': 'success',
+                'likert': 'warning',
+                'short_answer': 'danger',
+                'fill_blank': 'secondary',
+                'matching': 'dark',
+                'ordering': 'purple'
+            }.get(question.question_type, 'primary') }} text-white type-badge">
+                {{ question.type_label }}
+            </span>
         </div>
         <div class="card-body">
+
+            {# ═══════ SINGLE CHOICE ═══════ #}
+            {% if question.question_type == 'single_choice' %}
             <h5 class="card-title mb-3">{{ question.text }}</h5>
             {% for answer in question.answers %}
             <div class="form-check mb-2 answer-option">
-                <input class="form-check-input" type="radio"
+                <input class="form-check-input quiz-input" type="radio"
                        name="question_{{ question.id }}"
                        id="answer_{{ answer.id }}"
-                       value="{{ answer.id }}" required>
+                       value="{{ answer.id }}">
                 <label class="form-check-label w-100" for="answer_{{ answer.id }}">
                     {{ answer.text }}
                 </label>
             </div>
             {% endfor %}
+
+            {# ═══════ MULTIPLE CHOICE ═══════ #}
+            {% elif question.question_type == 'multiple_choice' %}
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            <p class="text-muted small"><i class="bi bi-info-circle"></i> Vyberte všechny odpovědi, které platí</p>
+            {% for answer in question.answers %}
+            <div class="form-check mb-2 answer-option">
+                <input class="form-check-input quiz-input" type="checkbox"
+                       name="question_{{ question.id }}"
+                       id="answer_{{ answer.id }}"
+                       value="{{ answer.id }}">
+                <label class="form-check-label w-100" for="answer_{{ answer.id }}">
+                    {{ answer.text }}
+                </label>
+            </div>
+            {% endfor %}
+
+            {# ═══════ TRUE / FALSE ═══════ #}
+            {% elif question.question_type == 'true_false' %}
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            <div class="d-flex gap-3 tf-options">
+                {% for answer in question.answers %}
+                <div class="flex-fill">
+                    <input class="btn-check quiz-input" type="radio"
+                           name="question_{{ question.id }}"
+                           id="answer_{{ answer.id }}"
+                           value="{{ answer.id }}">
+                    <label class="btn btn-outline-{{ 'success' if loop.index == 1 else 'danger' }} w-100 btn-lg tf-btn"
+                           for="answer_{{ answer.id }}">
+                        <i class="bi bi-{{ 'check-circle' if loop.index == 1 else 'x-circle' }}"></i>
+                        {{ answer.text }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# ═══════ LIKERT SCALE ═══════ #}
+            {% elif question.question_type == 'likert' %}
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            {% set labels = quiz_data.get(question.id, {}).get('labels',
+                ['Vůbec ne', 'Spíše ne', 'Neutrálně', 'Spíše ano', 'Rozhodně ano']) %}
+            <div class="likert-scale">
+                {% for answer in question.answers %}
+                <div class="likert-option">
+                    <input class="btn-check quiz-input" type="radio"
+                           name="question_{{ question.id }}"
+                           id="answer_{{ answer.id }}"
+                           value="{{ answer.id }}">
+                    <label class="btn btn-outline-primary likert-btn" for="answer_{{ answer.id }}">
+                        <div class="likert-number">{{ loop.index }}</div>
+                        <div class="likert-label">{{ labels[loop.index0] if loop.index0 < labels|length else answer.text }}</div>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# ═══════ SHORT ANSWER ═══════ #}
+            {% elif question.question_type == 'short_answer' %}
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-pencil"></i></span>
+                <input type="text" class="form-control form-control-lg quiz-input"
+                       name="question_{{ question.id }}"
+                       placeholder="Vaše odpověď..."
+                       autocomplete="off">
+            </div>
+
+            {# ═══════ FILL IN THE BLANK ═══════ #}
+            {% elif question.question_type == 'fill_blank' %}
+            {% set parts = question.text.split('____') %}
+            <h5 class="card-title mb-3">
+                {% if parts|length > 1 %}
+                    {{ parts[0] }}
+                    <span class="fill-blank-wrapper">
+                        <input type="text" class="form-control d-inline-block fill-blank-input quiz-input"
+                               name="question_{{ question.id }}"
+                               placeholder="..."
+                               autocomplete="off"
+                               style="width: 200px;">
+                    </span>
+                    {{ parts[1] }}
+                {% else %}
+                    {{ question.text }}
+                    <div class="mt-2">
+                        <input type="text" class="form-control quiz-input"
+                               name="question_{{ question.id }}"
+                               placeholder="Vaše odpověď..."
+                               autocomplete="off">
+                    </div>
+                {% endif %}
+            </h5>
+
+            {# ═══════ MATCHING ═══════ #}
+            {% elif question.question_type == 'matching' %}
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            <p class="text-muted small"><i class="bi bi-info-circle"></i> Ke každé položce vlevo vyberte správný pár vpravo</p>
+            {% set qdata = quiz_data.get(question.id, {}) %}
+            {% set pairs = qdata.get('pairs', []) %}
+            {% set shuffled = qdata.get('shuffled_rights', []) %}
+            <div class="matching-grid">
+                {% for pair in pairs %}
+                <div class="matching-row mb-3 d-flex align-items-center gap-3">
+                    <div class="matching-left flex-fill">
+                        <span class="badge bg-dark me-2">{{ loop.index }}</span>
+                        <strong>{{ pair.left }}</strong>
+                    </div>
+                    <div class="matching-arrow">
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </div>
+                    <div class="matching-right flex-fill">
+                        <select class="form-select quiz-input"
+                                name="question_{{ question.id }}_match_{{ loop.index0 }}">
+                            <option value="">— vyberte —</option>
+                            {% for right in shuffled %}
+                            <option value="{{ right }}">{{ right }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# ═══════ ORDERING ═══════ #}
+            {% elif question.question_type == 'ordering' %}
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            <p class="text-muted small"><i class="bi bi-info-circle"></i> Přetáhněte položky do správného pořadí (nebo použijte šipky)</p>
+            {% set qdata = quiz_data.get(question.id, {}) %}
+            {% set shuffled_items = qdata.get('shuffled_items', []) %}
+            <div class="ordering-list" id="ordering_{{ question.id }}" data-qid="{{ question.id }}">
+                {% for orig_idx, item_text in shuffled_items %}
+                <div class="ordering-item d-flex align-items-center gap-2 mb-2" data-idx="{{ orig_idx }}">
+                    <span class="ordering-handle"><i class="bi bi-grip-vertical"></i></span>
+                    <span class="ordering-pos badge bg-secondary">{{ loop.index }}</span>
+                    <span class="flex-fill">{{ item_text }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary order-up" title="Nahoru">
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary order-down" title="Dolů">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="question_{{ question.id }}_order" id="order_input_{{ question.id }}">
+
+            {% endif %}
         </div>
     </div>
     {% endfor %}
@@ -47,31 +208,116 @@
 document.addEventListener('DOMContentLoaded', function() {
     const total = {{ total }};
     const progressBar = document.getElementById('progressBar');
-    const currentQ = document.getElementById('currentQ');
+    const answeredEl = document.getElementById('answeredCount');
 
+    // ═══════ Progress tracking ═══════
     function updateProgress() {
         let answered = 0;
-        for (let i = 1; i <= total; i++) {
-            const card = document.querySelector(`[data-question="${i}"]`);
-            const radios = card.querySelectorAll('input[type="radio"]');
-            for (const radio of radios) {
-                if (radio.checked) { answered++; break; }
+        document.querySelectorAll('.question-card').forEach(card => {
+            const type = card.dataset.type;
+            if (type === 'single_choice' || type === 'true_false' || type === 'likert') {
+                if (card.querySelector('input[type="radio"]:checked')) answered++;
+            } else if (type === 'multiple_choice') {
+                if (card.querySelector('input[type="checkbox"]:checked')) answered++;
+            } else if (type === 'short_answer' || type === 'fill_blank') {
+                const inp = card.querySelector('input[type="text"]');
+                if (inp && inp.value.trim()) answered++;
+            } else if (type === 'matching') {
+                const selects = card.querySelectorAll('select');
+                let allFilled = true;
+                selects.forEach(s => { if (!s.value) allFilled = false; });
+                if (selects.length > 0 && allFilled) answered++;
+            } else if (type === 'ordering') {
+                // Ordering je vždy "zodpovězeno" jakmile existuje
+                answered++;
             }
-        }
+        });
         const pct = Math.round((answered / total) * 100);
         progressBar.style.width = pct + '%';
-        currentQ.textContent = Math.min(answered + 1, total);
+        answeredEl.textContent = answered;
     }
 
-    document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            updateProgress();
-            // Zvyrazneni vybrane odpovedi
-            const card = this.closest('.question-card');
+    // Odposlech změn
+    document.querySelectorAll('.quiz-input').forEach(el => {
+        el.addEventListener('change', () => { updateProgress(); highlightParent(el); });
+        el.addEventListener('input', () => { updateProgress(); });
+    });
+
+    function highlightParent(el) {
+        const opt = el.closest('.answer-option');
+        if (opt) {
+            const card = el.closest('.question-card');
             card.querySelectorAll('.answer-option').forEach(ao => ao.classList.remove('selected'));
-            this.closest('.answer-option').classList.add('selected');
+            if (el.type === 'checkbox') {
+                card.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                    cb.closest('.answer-option').classList.add('selected');
+                });
+            } else {
+                opt.classList.add('selected');
+            }
+        }
+    }
+
+    // ═══════ Ordering – SortableJS ═══════
+    document.querySelectorAll('.ordering-list').forEach(list => {
+        const qid = list.dataset.qid;
+
+        Sortable.create(list, {
+            handle: '.ordering-handle',
+            animation: 200,
+            ghostClass: 'ordering-ghost',
+            onEnd: () => { updateOrderInput(list, qid); updateOrderPositions(list); }
+        });
+
+        // Šipky nahoru/dolů
+        list.querySelectorAll('.order-up').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.ordering-item');
+                const prev = item.previousElementSibling;
+                if (prev) {
+                    list.insertBefore(item, prev);
+                    updateOrderInput(list, qid);
+                    updateOrderPositions(list);
+                }
+            });
+        });
+        list.querySelectorAll('.order-down').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.ordering-item');
+                const next = item.nextElementSibling;
+                if (next) {
+                    list.insertBefore(next, item);
+                    updateOrderInput(list, qid);
+                    updateOrderPositions(list);
+                }
+            });
+        });
+
+        // Inicializace
+        updateOrderInput(list, qid);
+        updateOrderPositions(list);
+    });
+
+    function updateOrderInput(list, qid) {
+        const items = list.querySelectorAll('.ordering-item');
+        const order = Array.from(items).map(item => item.dataset.idx).join(',');
+        document.getElementById('order_input_' + qid).value = order;
+    }
+
+    function updateOrderPositions(list) {
+        list.querySelectorAll('.ordering-item').forEach((item, i) => {
+            item.querySelector('.ordering-pos').textContent = i + 1;
+        });
+    }
+
+    // ═══════ Form submit – nastavit ordering inputs ═══════
+    document.getElementById('quizForm').addEventListener('submit', () => {
+        document.querySelectorAll('.ordering-list').forEach(list => {
+            updateOrderInput(list, list.dataset.qid);
         });
     });
+
+    updateProgress();
 });
 </script>
 {% endblock %}

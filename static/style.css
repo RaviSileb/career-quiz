@@ -1,4 +1,4 @@
-/* Kariérní kvíz – hlavní styly */
+/* Kariérní kvíz v0.1.0 – styly pro 8 typů otázek */
 
 body {
     background-color: #f8f9fa;
@@ -7,16 +7,12 @@ body {
     flex-direction: column;
 }
 
-main {
-    flex: 1;
-}
+main { flex: 1; }
 
-/* Hero sekce */
-.hero-section {
-    padding: 3rem 0;
-}
+/* Hero */
+.hero-section { padding: 3rem 0; }
 
-/* Kategorie karty */
+/* Kategorie */
 .category-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -25,39 +21,141 @@ main {
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-/* Kvíz */
+/* Typ badge karty */
+.type-badge-card {
+    transition: transform 0.15s;
+}
+.type-badge-card:hover {
+    transform: scale(1.05);
+}
+
+/* Kvíz – obecné */
 .question-card {
     transition: border-color 0.3s ease;
 }
-.question-card .card-header {
-    font-size: 0.9rem;
-}
+.question-card .card-header { font-size: 0.9rem; }
+
+.type-badge { font-size: 0.7rem; letter-spacing: 0.3px; }
+.bg-purple { background-color: #6f42c1 !important; }
+
+/* Answer option – radio/checkbox */
 .answer-option {
     padding: 0.6rem 1rem;
     border-radius: 8px;
     transition: background-color 0.2s ease;
     cursor: pointer;
 }
-.answer-option:hover {
-    background-color: #e8f4fd;
-}
+.answer-option:hover { background-color: #e8f4fd; }
 .answer-option.selected {
     background-color: #d1ecf1;
     border-left: 3px solid #0d6efd;
 }
-.answer-option label {
-    cursor: pointer;
+.answer-option label { cursor: pointer; }
+
+/* True/False tlačítka */
+.tf-btn {
+    padding: 1rem;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+.btn-check:checked + .tf-btn.btn-outline-success {
+    background-color: #198754;
+    color: white;
+    transform: scale(1.02);
+}
+.btn-check:checked + .tf-btn.btn-outline-danger {
+    background-color: #dc3545;
+    color: white;
+    transform: scale(1.02);
+}
+
+/* Likert škála */
+.likert-scale {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.likert-option { flex: 1; min-width: 100px; }
+.likert-btn {
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.likert-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.likert-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+.btn-check:checked + .likert-btn {
+    background-color: #0d6efd;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(13,110,253,0.3);
+}
+.btn-check:checked + .likert-btn .likert-label { color: rgba(255,255,255,0.85); }
+
+/* Fill in blank */
+.fill-blank-input {
+    border: none;
+    border-bottom: 2px solid #0d6efd;
+    border-radius: 0;
+    font-weight: bold;
+    text-align: center;
+    background: transparent;
+}
+.fill-blank-input:focus {
+    box-shadow: none;
+    border-bottom-color: #0a58ca;
+}
+
+/* Matching */
+.matching-row {
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: background 0.2s;
+}
+.matching-row:hover { background: #e9ecef; }
+.matching-left { font-size: 0.95rem; }
+.matching-arrow { padding: 0 0.5rem; }
+
+/* Ordering */
+.ordering-item {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+    cursor: grab;
+}
+.ordering-item:hover {
+    background: #e8f4fd;
+    border-color: #0d6efd;
+}
+.ordering-handle {
+    cursor: grab;
+    color: #adb5bd;
+    font-size: 1.2rem;
+}
+.ordering-ghost {
+    opacity: 0.4;
+    background: #cfe2ff;
+}
+.ordering-pos {
+    min-width: 28px;
+    text-align: center;
 }
 
 /* Progress bar animace */
-.progress-bar {
-    transition: width 0.4s ease;
-}
+.progress-bar { transition: width 0.4s ease; }
 
 /* Výsledky */
-.card.border-warning {
-    border-width: 3px !important;
-}
+.card.border-warning { border-width: 3px !important; }
 
 /* Admin */
 .answer-card {
@@ -70,21 +168,23 @@ main {
 
 /* Responsivita */
 @media (max-width: 768px) {
-    .hero-section {
-        padding: 2rem 0;
-    }
-    .hero-section h1 {
-        font-size: 2rem;
-    }
-    .btn-lg {
-        font-size: 1rem;
-        padding: 0.6rem 1.5rem;
-    }
+    .hero-section { padding: 2rem 0; }
+    .hero-section h1 { font-size: 2rem; }
+    .btn-lg { font-size: 1rem; padding: 0.6rem 1.5rem; }
+
+    .likert-scale { gap: 0.25rem; }
+    .likert-option { min-width: 60px; }
+    .likert-number { font-size: 1.2rem; }
+    .likert-label { font-size: 0.65rem; }
+
+    .tf-btn { padding: 0.75rem; font-size: 0.9rem; }
+
+    .matching-row { flex-direction: column; }
+    .matching-arrow { display: none; }
+    .matching-left { margin-bottom: 0.5rem; }
 }
 
 /* Tisk */
 @media print {
-    .navbar, footer, .btn {
-        display: none !important;
-    }
+    .navbar, footer, .btn { display: none !important; }
 }

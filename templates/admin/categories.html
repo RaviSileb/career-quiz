@@ -9,24 +9,20 @@
     </a>
 </div>
 
-<div class="row g-3">
+<div class="row g-4">
     {% for cat in categories %}
     <div class="col-md-6 col-lg-4">
         <div class="card h-100" style="border-left: 4px solid {{ cat.color }};">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <h5>{{ cat.icon }} {{ cat.name }}</h5>
-                </div>
+                <h5>{{ cat.icon }} {{ cat.name }}</h5>
                 <p class="text-muted small">{{ cat.description }}</p>
                 <div class="btn-group btn-group-sm">
                     <a href="{{ url_for('admin_category_edit', cat_id=cat.id) }}" class="btn btn-outline-primary">
                         <i class="bi bi-pencil"></i> Upravit
                     </a>
                     <form method="POST" action="{{ url_for('admin_category_delete', cat_id=cat.id) }}"
-                          onsubmit="return confirm('Opravdu smazat kategorii {{ cat.name }}?');" class="d-inline">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash"></i> Smazat
-                        </button>
+                          onsubmit="return confirm('Smazat kategorii {{ cat.name }}?');" class="d-inline">
+                        <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Smazat</button>
                     </form>
                 </div>
             </div>

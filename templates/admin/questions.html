@@ -13,16 +13,25 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <label class="form-label">Hledat</label>
                 <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Text otázky...">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">Kategorie</label>
                 <select class="form-select" name="category">
                     <option value="0">-- Všechny --</option>
                     {% for cat in categories %}
                     <option value="{{ cat.id }}" {{ 'selected' if cat.id == category_id }}>{{ cat.icon }} {{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Typ otázky</label>
+                <select class="form-select" name="type">
+                    <option value="">-- Všechny --</option>
+                    {% for code, label in question_types.items() %}
+                    <option value="{{ code }}" {{ 'selected' if code == qtype }}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -33,14 +42,14 @@
     </div>
 </div>
 
-<!-- Tabulka otazek -->
+<!-- Tabulka otázek -->
 <div class="table-responsive">
     <table class="table table-hover">
         <thead class="table-light">
             <tr>
                 <th width="50">#</th>
                 <th>Otázka</th>
-                <th width="80">Odpovědí</th>
+                <th width="140">Typ</th>
                 <th width="80">Stav</th>
                 <th width="200">Akce</th>
             </tr>
@@ -49,8 +58,8 @@
             {% for q in questions.items %}
             <tr class="{{ 'table-secondary' if not q.active }}">
                 <td>{{ q.id }}</td>
-                <td>{{ q.text }}</td>
-                <td>{{ q.answers|length }}</td>
+                <td>{{ q.text[:80] }}{{ '...' if q.text|length > 80 }}</td>
+                <td><span class="badge bg-info text-dark">{{ q.type_label }}</span></td>
                 <td>
                     {% if q.active %}
                     <span class="badge bg-success">Aktivní</span>
@@ -64,7 +73,8 @@
                             <i class="bi bi-pencil"></i>
                         </a>
                         <form method="POST" action="{{ url_for('admin_question_toggle', q_id=q.id) }}" class="d-inline">
-                            <button class="btn btn-outline-{{ 'warning' if q.active else 'success' }} btn-sm" title="{{ 'Deaktivovat' if q.active else 'Aktivovat' }}">
+                            <button class="btn btn-outline-{{ 'warning' if q.active else 'success' }} btn-sm"
+                                    title="{{ 'Deaktivovat' if q.active else 'Aktivovat' }}">
                                 <i class="bi bi-{{ 'pause' if q.active else 'play' }}"></i>
                             </button>
                         </form>
@@ -80,24 +90,28 @@
     </table>
 </div>
 
-<!-- Strankovani -->
+<!-- Stránkování -->
 {% if questions.pages > 1 %}
 <nav>
     <ul class="pagination justify-content-center">
         {% if questions.has_prev %}
-        <li class="page-item"><a class="page-link" href="?page={{ questions.prev_num }}&search={{ search }}&category={{ category_id }}">«</a></li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ questions.prev_num }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}">«</a>
+        </li>
         {% endif %}
         {% for p in questions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
         {% if p %}
         <li class="page-item {{ 'active' if p == questions.page }}">
-            <a class="page-link" href="?page={{ p }}&search={{ search }}&category={{ category_id }}">{{ p }}</a>
+            <a class="page-link" href="?page={{ p }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}">{{ p }}</a>
         </li>
         {% else %}
         <li class="page-item disabled"><span class="page-link">...</span></li>
         {% endif %}
         {% endfor %}
         {% if questions.has_next %}
-        <li class="page-item"><a class="page-link" href="?page={{ questions.next_num }}&search={{ search }}&category={{ category_id }}">»</a></li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ questions.next_num }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}">»</a>
+        </li>
         {% endif %}
     </ul>
 </nav>

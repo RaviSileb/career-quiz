@@ -2,8 +2,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import json
 
 db = SQLAlchemy()
+
+QUESTION_TYPES = {
+    'single_choice': 'Výběr jedné odpovědi',
+    'multiple_choice': 'Více správných odpovědí',
+    'true_false': 'Pravda / Nepravda',
+    'likert': 'Škálování (Likert)',
+    'short_answer': 'Krátká odpověď',
+    'fill_blank': 'Doplňování',
+    'matching': 'Přiřazování',
+    'ordering': 'Seřazování',
+}
 
 
 class AdminUser(UserMixin, db.Model):
@@ -32,9 +44,29 @@ class Question(db.Model):
     __tablename__ = 'question'
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
+    question_type = db.Column(db.String(20), default='single_choice')
     order_num = db.Column(db.Integer, default=0)
     active = db.Column(db.Boolean, default=True)
-    answers = db.relationship('Answer', backref='question', cascade='all, delete-orphan', order_by='Answer.order_num')
+    extra_data = db.Column(db.Text)
+    answers = db.relationship('Answer', backref='question',
+                              cascade='all, delete-orphan', order_by='Answer.order_num')
+
+    @property
+    def extra_data_parsed(self):
+        if self.extra_data:
+            try:
+                return json.loads(self.extra_data)
+            except (json.JSONDecodeError, TypeError):
+                return {}
+        return {}
+
+    @extra_data_parsed.setter
+    def extra_data_parsed(self, value):
+        self.extra_data = json.dumps(value, ensure_ascii=False) if value else None
+
+    @property
+    def type_label(self):
+        return QUESTION_TYPES.get(self.question_type, self.question_type)
 
 
 class Answer(db.Model):
@@ -61,4 +93,6 @@ class QuizResult(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     top_category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     scores_json = db.Column(db.Text)
+    answered_count = db.Column(db.Integer, default=0)
+    total_count = db.Column(db.Integer, default=0)
     top_category = db.relationship('Category')
