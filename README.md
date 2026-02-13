@@ -1,30 +1,42 @@
-# 🎯 Career Quiz
+# 🎯 Career Quiz v0.2.0
 
-Interaktivní kariérní kvíz, který pomocí 135 otázek různých typů pomáhá uživatelům zjistit, které profesní oblasti jim nejvíce vyhovují.
+Dvoudílný interaktivní kariérní kvíz s **1015 otázkami**, který pomáhá uživatelům najít ideální kariérní směr i konkrétní pracovní pozici. Pozice vycházejí z databáze [NSP.cz](https://nsp.cz).
 
 ## ✨ Funkce
 
+- **Dvoudílný kvíz:**
+  - **Část 1 – Kariérní směr:** 135 otázek (7 typů), určí top 3 kariérní kategorie
+  - **Část 2 – Konkrétní pozice:** 880 otázek zaměřených na 88 pracovních pozic dle NSP.cz
 - **7 typů otázek** – výběr jedné/více odpovědí, pravda/nepravda, Likert škála, krátká odpověď, přiřazování, seřazování
-- **135 kariérních otázek** pokrývajících 11 profesních kategorií
-- **Automatické vyhodnocení** s grafem výsledků a top 3 doporučenými oblastmi
-- **Admin rozhraní** pro správu otázek a kategorií (CRUD)
+- **88 pracovních pozic** (8 na kategorii) s popisy dle NSP.cz
+- **Konfigurovatelný počet otázek** – admin nastaví kolik otázek se zobrazí v každé části (výchozí: 40 + 40)
+- **Mezivýsledky** po 1. části s grafickým zobrazením top 3 kategorií
+- **Finální výsledky** s doporučenými pozicemi a podrobnostmi podle kategorií
+- **Admin rozhraní** pro správu otázek, kategorií a nastavení kvízu
 - **Responzivní design** – Bootstrap 5 + SortableJS pro drag & drop
 
-## 📊 Profesní kategorie
+## 🔄 Jak kvíz funguje
 
-| Ikona | Kategorie |
-|-------|-----------|
-| 🌾 | Zemědělství a lesnictví |
-| 🏗️ | Stavebnictví a architektura |
-| ⚙️ | Strojírenství a elektrotechnika |
-| 🚗 | Doprava a logistika |
-| 💻 | Informační technologie |
-| 🏥 | Zdravotnictví a medicína |
-| 🛒 | Obchod a služby |
-| 📚 | Školství a vzdělávání |
-| ⚖️ | Právo a veřejná správa |
-| 📊 | Management a podnikání |
-| 🎨 | Umění a kultura |
+1. **Část 1** – Žák odpoví na 40 otázek různých typů → systém vyhodnotí 3 nejsilnější kariérní kategorie
+2. **Mezivýsledky** – Zobrazí se přehled kategorií s procentuálním skóre
+3. **Část 2** – 40 otázek z top 3 kategorií cílí na konkrétní pracovní pozice
+4. **Výsledky** – Top pozice s popisem + kompletní přehled kategorií a pozic
+
+## 📊 Profesní kategorie a pozice
+
+| Ikona | Kategorie | Pozice |
+|-------|-----------|--------|
+| 🌾 | Zemědělství a lesnictví | Agronom, Veterinář, Lesní inženýr, Zahradník, Zem. technik, Chovatel, Myslivec, Ekolog |
+| 🏗️ | Stavebnictví a architektura | Architekt, Stavbyvedoucí, Projektant, Geodet, Rozpočtář, Interiér. designér, Zedník, Instalatér |
+| ⚙️ | Strojírenství a elektrotechnika | Strojní konstruktér, Technolog, Elektrotechnik, Autotronik, CNC programátor, Svářeč, Obráběč, Mechatronik |
+| 🚗 | Doprava a logistika | Logistik, Pilot, Řidič, Dispečer, Strojvedoucí, Kapitán plavidla, Skladník, Celník |
+| 💻 | Informační technologie | Programátor, Analytik IT, Správce sítí, Webdesigner, Tester, Datový inženýr, Kybernetik, Herní vývojář |
+| 🏥 | Zdravotnictví a medicína | Lékař, Farmaceut, Zubař, Zdravotní sestra, Fyzioterapeut, Záchranář, Nutriční terapeut, Biomed. inženýr |
+| 🛒 | Obchod a služby | Obch. zástupce, Marketing. specialista, Nákupčí, Kuchař, Průvodce, Recepční, Realitní makléř, Barman |
+| 📚 | Školství a vzdělávání | Učitel, Lektor, Vědecký pracovník, Kouč, Trenér, Vychovatel, Speciální pedagog, Knihovník |
+| ⚖️ | Právo a veřejná správa | Advokát, Soudce, Notář, Státní zástupce, Exekutor, Policista, Hasič, Úředník |
+| 📊 | Management a podnikání | Gen. ředitel, Projektový manažer, Finanční analytik, Účetní, HR specialista, Manažer kvality, Podnikatel, Controller |
+| 🎨 | Umění a kultura | Herec, Režisér, Hudebník, Grafik, Fotograf, Spisovatel, Kameraman, Ilustrátor |
 
 ## 🛠️ Technologie
 
@@ -32,10 +44,19 @@ Interaktivní kariérní kvíz, který pomocí 135 otázek různých typů pomá
 - **Databáze:** SQLite
 - **Frontend:** Bootstrap 5.3, Bootstrap Icons, SortableJS
 - **Kontejnerizace:** Docker
+- **Registry:** GitHub Container Registry (ghcr.io)
 
 ## 🚀 Spuštění
 
-### Docker (doporučeno)
+### Z GHCR (nejjednodušší)
+
+```bash
+docker login ghcr.io -u RaviSileb
+docker pull ghcr.io/ravisileb/career-quiz:v0.2.0
+docker run -d --name career-quiz -p 8080:5000 ghcr.io/ravisileb/career-quiz:v0.2.0
+```
+
+### Lokální build
 
 ```bash
 docker build -t career-quiz .
@@ -44,7 +65,7 @@ docker run -d --name career-quiz -p 8080:5000 career-quiz
 
 Aplikace poběží na **http://localhost:8080**
 
-### Lokálně
+### Bez Dockeru
 
 ```bash
 pip install -r requirements.txt
@@ -59,15 +80,21 @@ Přístup na `/admin/login` s výchozími přihlašovacími údaji:
 - **Uživatel:** `admin`
 - **Heslo:** `admin123`
 
+Admin umožňuje:
+- Správu kategorií a otázek (CRUD, filtrování podle části/typu/kategorie)
+- Nastavení počtu otázek pro Část 1 a Část 2
+- Přehled výsledků kvízů
+
 > ⚠️ V produkci změňte heslo a `SECRET_KEY` v Dockerfile.
 
 ## 📁 Struktura projektu
 
 ```
 career_quiz/
-├── app.py                 # Flask aplikace + routing + scoring engine
-├── models.py              # SQLAlchemy modely (Question, Category, ...)
-├── init_data.py           # 135 otázek a 11 kategorií
+├── app.py                 # Flask aplikace, routing, scoring engine (Part 1 + 2)
+├── models.py              # SQLAlchemy modely (Question, Category, Position, ...)
+├── init_data.py           # 135 Part-1 otázek, 11 kategorií, 88 pozic
+├── init_data_part2.py     # 880 Part-2 otázek (80 × 11 kategorií)
 ├── init_db.py             # Inicializace databáze
 ├── requirements.txt       # Python závislosti
 ├── Dockerfile             # Docker konfigurace
@@ -75,10 +102,17 @@ career_quiz/
 │   └── style.css          # Vlastní styly
 └── templates/
     ├── base.html           # Základní layout
-    ├── index.html          # Úvodní stránka
-    ├── quiz.html           # Kvíz
-    ├── result.html         # Výsledky
-    └── admin/              # Admin šablony
+    ├── index.html          # Úvodní stránka s popisem kvízu
+    ├── quiz.html           # Část 1 – kariérní směr
+    ├── quiz_part2.html     # Část 2 – konkrétní pozice
+    ├── part1_results.html  # Mezivýsledky po 1. části
+    ├── result.html         # Finální výsledky
+    └── admin/
+        ├── dashboard.html  # Admin přehled
+        ├── settings.html   # Nastavení počtu otázek
+        ├── questions.html  # Správa otázek
+        ├── categories.html # Správa kategorií
+        └── ...
 ```
 
 ## 📝 Licence
