@@ -1,0 +1,90 @@
+/* Kariérní kvíz – hlavní styly */
+
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Hero sekce */
+.hero-section {
+    padding: 3rem 0;
+}
+
+/* Kategorie karty */
+.category-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Kvíz */
+.question-card {
+    transition: border-color 0.3s ease;
+}
+.question-card .card-header {
+    font-size: 0.9rem;
+}
+.answer-option {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+.answer-option:hover {
+    background-color: #e8f4fd;
+}
+.answer-option.selected {
+    background-color: #d1ecf1;
+    border-left: 3px solid #0d6efd;
+}
+.answer-option label {
+    cursor: pointer;
+}
+
+/* Progress bar animace */
+.progress-bar {
+    transition: width 0.4s ease;
+}
+
+/* Výsledky */
+.card.border-warning {
+    border-width: 3px !important;
+}
+
+/* Admin */
+.answer-card {
+    border-left: 3px solid #0d6efd;
+}
+.answer-card .input-group-text {
+    min-width: 2.5rem;
+    justify-content: center;
+}
+
+/* Responsivita */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 0;
+    }
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    .btn-lg {
+        font-size: 1rem;
+        padding: 0.6rem 1.5rem;
+    }
+}
+
+/* Tisk */
+@media print {
+    .navbar, footer, .btn {
+        display: none !important;
+    }
+}

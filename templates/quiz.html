@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Kvíz – Otázky{% endblock %}
+
+{% block content %}
+<div class="quiz-header text-center mb-4">
+    <h2><i class="bi bi-pencil-square"></i> Kariérní kvíz</h2>
+    <p class="text-muted">Odpověz na všech {{ total }} otázek a zjisti svou ideální kariéru.</p>
+    <div class="progress mb-3" style="height: 8px;">
+        <div class="progress-bar bg-primary" id="progressBar" style="width: 0%"></div>
+    </div>
+    <small class="text-muted">Otázka <span id="currentQ">1</span> z {{ total }}</small>
+</div>
+
+<form method="POST" action="{{ url_for('submit') }}" id="quizForm">
+    {% for question in questions %}
+    <div class="question-card card mb-4" data-question="{{ loop.index }}">
+        <div class="card-header bg-light">
+            <strong>Otázka {{ loop.index }}/{{ total }}</strong>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title mb-3">{{ question.text }}</h5>
+            {% for answer in question.answers %}
+            <div class="form-check mb-2 answer-option">
+                <input class="form-check-input" type="radio"
+                       name="question_{{ question.id }}"
+                       id="answer_{{ answer.id }}"
+                       value="{{ answer.id }}" required>
+                <label class="form-check-label w-100" for="answer_{{ answer.id }}">
+                    {{ answer.text }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="text-center mb-5">
+        <button type="submit" class="btn btn-success btn-lg px-5" id="submitBtn">
+            <i class="bi bi-check-circle"></i> Vyhodnotit kvíz
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const total = {{ total }};
+    const progressBar = document.getElementById('progressBar');
+    const currentQ = document.getElementById('currentQ');
+
+    function updateProgress() {
+        let answered = 0;
+        for (let i = 1; i <= total; i++) {
+            const card = document.querySelector(`[data-question="${i}"]`);
+            const radios = card.querySelectorAll('input[type="radio"]');
+            for (const radio of radios) {
+                if (radio.checked) { answered++; break; }
+            }
+        }
+        const pct = Math.round((answered / total) * 100);
+        progressBar.style.width = pct + '%';
+        currentQ.textContent = Math.min(answered + 1, total);
+    }
+
+    document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            updateProgress();
+            // Zvyrazneni vybrane odpovedi
+            const card = this.closest('.question-card');
+            card.querySelectorAll('.answer-option').forEach(ao => ao.classList.remove('selected'));
+            this.closest('.answer-option').classList.add('selected');
+        });
+    });
+});
+</script>
+{% endblock %}

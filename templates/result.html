@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Výsledky kvízu{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h2><i class="bi bi-trophy-fill text-warning"></i> Výsledky kvízu</h2>
+    <p class="text-muted">Odpověděl/a jsi na {{ answered }} otázek</p>
+</div>
+
+<!-- Top 3 vysledky -->
+<div class="row g-4 mb-5">
+    {% for r in top_results %}
+    <div class="col-md-4">
+        <div class="card h-100 {% if loop.index == 1 %}border-warning shadow-lg{% endif %}">
+            <div class="card-body text-center">
+                {% if loop.index == 1 %}
+                <div class="fs-1 mb-2">🥇</div>
+                {% elif loop.index == 2 %}
+                <div class="fs-1 mb-2">🥈</div>
+                {% else %}
+                <div class="fs-1 mb-2">🥉</div>
+                {% endif %}
+                <div class="fs-2 mb-2">{{ r.category.icon }}</div>
+                <h4 style="color: {{ r.category.color }};">{{ r.category.name }}</h4>
+                <p class="text-muted small">{{ r.category.description }}</p>
+                <div class="display-6 fw-bold" style="color: {{ r.category.color }};">
+                    {{ r.percentage }}%
+                </div>
+                <small class="text-muted">({{ r.score }} bodů)</small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Kompletni prehled -->
+<h4 class="mb-3">Kompletní přehled všech kategorií</h4>
+<div class="card">
+    <div class="card-body">
+        {% for r in results %}
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>{{ r.category.icon }} <strong>{{ r.category.name }}</strong></span>
+                <span class="badge" style="background-color: {{ r.category.color }};">
+                    {{ r.score }} bodů ({{ r.percentage }}%)
+                </span>
+            </div>
+            <div class="progress" style="height: 24px;">
+                <div class="progress-bar" role="progressbar"
+                     style="width: {{ r.percentage }}%; background-color: {{ r.category.color }};"
+                     aria-valuenow="{{ r.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="text-center mt-4 mb-5">
+    <a href="{{ url_for('quiz') }}" class="btn btn-primary btn-lg me-2">
+        <i class="bi bi-arrow-repeat"></i> Zkusit znovu
+    </a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+        <i class="bi bi-house"></i> Na úvod
+    </a>
+</div>
+{% endblock %}

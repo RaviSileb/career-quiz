@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Admin – Otázky{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-question-circle"></i> Otázky</h2>
+    <a href="{{ url_for('admin_question_new') }}" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Nová otázka
+    </a>
+</div>
+
+<!-- Filtr -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label">Hledat</label>
+                <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Text otázky...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Kategorie</label>
+                <select class="form-select" name="category">
+                    <option value="0">-- Všechny --</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {{ 'selected' if cat.id == category_id }}>{{ cat.icon }} {{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrovat</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabulka otazek -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th width="50">#</th>
+                <th>Otázka</th>
+                <th width="80">Odpovědí</th>
+                <th width="80">Stav</th>
+                <th width="200">Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in questions.items %}
+            <tr class="{{ 'table-secondary' if not q.active }}">
+                <td>{{ q.id }}</td>
+                <td>{{ q.text }}</td>
+                <td>{{ q.answers|length }}</td>
+                <td>
+                    {% if q.active %}
+                    <span class="badge bg-success">Aktivní</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Neaktivní</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('admin_question_edit', q_id=q.id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="POST" action="{{ url_for('admin_question_toggle', q_id=q.id) }}" class="d-inline">
+                            <button class="btn btn-outline-{{ 'warning' if q.active else 'success' }} btn-sm" title="{{ 'Deaktivovat' if q.active else 'Aktivovat' }}">
+                                <i class="bi bi-{{ 'pause' if q.active else 'play' }}"></i>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin_question_delete', q_id=q.id) }}"
+                              onsubmit="return confirm('Smazat otázku #{{ q.id }}?');" class="d-inline">
+                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Strankovani -->
+{% if questions.pages > 1 %}
+<nav>
+    <ul class="pagination justify-content-center">
+        {% if questions.has_prev %}
+        <li class="page-item"><a class="page-link" href="?page={{ questions.prev_num }}&search={{ search }}&category={{ category_id }}">«</a></li>
+        {% endif %}
+        {% for p in questions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+        <li class="page-item {{ 'active' if p == questions.page }}">
+            <a class="page-link" href="?page={{ p }}&search={{ search }}&category={{ category_id }}">{{ p }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+        {% endfor %}
+        {% if questions.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ questions.next_num }}&search={{ search }}&category={{ category_id }}">»</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Admin – {{ 'Upravit' if question else 'Nová' }} otázka{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-question-circle"></i>
+    {{ 'Upravit otázku #' ~ question.id if question else 'Nová otázka' }}
+</h2>
+
+<form method="POST" id="questionForm">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="text" class="form-label">Text otázky *</label>
+                <input type="text" class="form-control form-control-lg" id="text" name="text"
+                       value="{{ question.text if question else '' }}" required>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
+                       {{ 'checked' if not question or question.active }}>
+                <label class="form-check-label" for="is_active">Aktivní (zobrazovat v kvízu)</label>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Odpovědi a bodování</h4>
+    <div id="answersContainer">
+        <!-- Dynamicky naplneno JS -->
+    </div>
+
+    <button type="button" class="btn btn-outline-primary mb-4" onclick="addAnswer()">
+        <i class="bi bi-plus-lg"></i> Přidat odpověď
+    </button>
+
+    <div class="d-flex gap-2 mb-5">
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-check-lg"></i> {{ 'Uložit změny' if question else 'Vytvořit otázku' }}
+        </button>
+        <a href="{{ url_for('admin_questions') }}" class="btn btn-outline-secondary btn-lg">Zpět</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let answerCount = 0;
+
+const cats = [
+    {% for cat in categories %}
+    {id: {{ cat.id }}, name: "{{ cat.name }}", icon: "{{ cat.icon }}"},
+    {% endfor %}
+];
+
+function addAnswer(text = '', scores = {}) {
+    const idx = answerCount++;
+    const container = document.getElementById('answersContainer');
+    const card = document.createElement('div');
+    card.className = 'card mb-3 answer-card';
+    card.id = `answer_${idx}`;
+
+    let scoresHTML = '';
+    cats.forEach(cat => {
+        const val = scores[cat.id] || 0;
+        scoresHTML += `
+            <div class="col-md-4 col-lg-3 mb-2">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" title="${cat.name}">${cat.icon}</span>
+                    <input type="number" class="form-control" name="answer_${idx}_score_${cat.id}"
+                           value="${val}" min="0" max="5" title="${cat.name}">
+                </div>
+            </div>`;
+    });
+
+    card.innerHTML = `
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Odpověď ${idx + 1}</strong>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAnswer(${idx})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" class="form-control" name="answer_${idx}_text"
+                       value="${text}" placeholder="Text odpovědi" required>
+            </div>
+            <label class="form-label small text-muted">Bodování podle kategorií (0 = žádný vliv):</label>
+            <div class="row">${scoresHTML}</div>
+        </div>`;
+
+    container.appendChild(card);
+}
+
+function removeAnswer(idx) {
+    const el = document.getElementById(`answer_${idx}`);
+    if (el) el.remove();
+}
+
+// Naplneni existujicich odpovedi nebo vytvoreni 4 prazdnych
+document.addEventListener('DOMContentLoaded', function() {
+    {% if answers_data %}
+        {% for a in answers_data %}
+        addAnswer("{{ a.text | e }}", {{ a.scores | tojson }});
+        {% endfor %}
+    {% else %}
+        for (let i = 0; i < 4; i++) addAnswer();
+    {% endif %}
+});
+</script>
+{% endblock %}
