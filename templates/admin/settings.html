@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Admin – Nastavení kvízu{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-sliders"></i> Nastavení kvízu</h2>
+
+<form method="POST">
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-1-circle"></i> Část 1: Kariérní směr
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="part1_count" class="form-label">Počet otázek v kvízu</label>
+                        <input type="number" class="form-control form-control-lg" id="part1_count"
+                               name="part1_count" value="{{ part1_count }}" min="1" max="200">
+                        <div class="form-text">
+                            Celkem dostupných Part-1 otázek: <strong>{{ p1_total }}</strong>
+                        </div>
+                    </div>
+                    <p class="text-muted small">
+                        Otázky zjišťují celkový kariérní směr žáka. Využívá se 7 různých typů otázek
+                        (výběr, škálování, přiřazování, seřazování, krátká odpověď apod.).
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-2-circle"></i> Část 2: Konkrétní pozice
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="part2_count" class="form-label">Počet otázek v kvízu</label>
+                        <input type="number" class="form-control form-control-lg" id="part2_count"
+                               name="part2_count" value="{{ part2_count }}" min="1" max="200">
+                        <div class="form-text">
+                            Celkem dostupných Part-2 otázek: <strong>{{ p2_total }}</strong>
+                        </div>
+                    </div>
+                    <p class="text-muted small">
+                        Otázky cílí na konkrétní pracovní pozice v rámci top-3 kategorií z první části.
+                        Rozloží se rovnoměrně mezi 3 nejsilnější kategorie.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Part 2 per category -->
+    <div class="card mb-4">
+        <div class="card-header"><i class="bi bi-diagram-3"></i> Otázky Part 2 podle kategorií</div>
+        <div class="card-body">
+            <div class="row g-2">
+                {% for cat, cnt in cat_p2.items() %}
+                <div class="col-md-4 col-6">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ cat.icon }} {{ cat.name }}</span>
+                        <span class="badge bg-secondary">{{ cnt }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-5">
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-check-lg"></i> Uložit nastavení
+        </button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-lg">Zpět</a>
+    </div>
+</form>
+{% endblock %}

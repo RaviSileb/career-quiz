@@ -10,10 +10,18 @@
 <form method="POST">
     <div class="card mb-4">
         <div class="card-body">
-            <div class="mb-3">
-                <label for="name" class="form-label">Název *</label>
-                <input type="text" class="form-control" id="name" name="name"
-                       value="{{ category.name if category else '' }}" required>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Název *</label>
+                    <input type="text" class="form-control" id="name" name="name"
+                           value="{{ category.name if category else '' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="code" class="form-label">Kód (max 10 znaků)</label>
+                    <input type="text" class="form-control" id="code" name="code"
+                           value="{{ category.code if category else '' }}" maxlength="10"
+                           placeholder="např. ZEM">
+                </div>
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Popis</label>

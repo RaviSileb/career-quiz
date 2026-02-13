@@ -13,9 +13,17 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Hledat</label>
                 <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Text otázky...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Část</label>
+                <select class="form-select" name="part">
+                    <option value="0">-- Obě --</option>
+                    <option value="1" {{ 'selected' if part_filter == 1 }}>Část 1</option>
+                    <option value="2" {{ 'selected' if part_filter == 2 }}>Část 2</option>
+                </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Kategorie</label>
@@ -35,7 +43,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrovat</button>
             </div>
         </form>
@@ -49,6 +57,7 @@
             <tr>
                 <th width="50">#</th>
                 <th>Otázka</th>
+                <th width="50">Část</th>
                 <th width="140">Typ</th>
                 <th width="80">Stav</th>
                 <th width="200">Akce</th>
@@ -59,6 +68,7 @@
             <tr class="{{ 'table-secondary' if not q.active }}">
                 <td>{{ q.id }}</td>
                 <td>{{ q.text[:80] }}{{ '...' if q.text|length > 80 }}</td>
+                <td><span class="badge bg-{{ 'primary' if q.part == 1 else 'success' }}">{{ q.part }}</span></td>
                 <td><span class="badge bg-info text-dark">{{ q.type_label }}</span></td>
                 <td>
                     {% if q.active %}
@@ -96,13 +106,13 @@
     <ul class="pagination justify-content-center">
         {% if questions.has_prev %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ questions.prev_num }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}">«</a>
+            <a class="page-link" href="?page={{ questions.prev_num }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}&part={{ part_filter }}">«</a>
         </li>
         {% endif %}
         {% for p in questions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
         {% if p %}
         <li class="page-item {{ 'active' if p == questions.page }}">
-            <a class="page-link" href="?page={{ p }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}">{{ p }}</a>
+            <a class="page-link" href="?page={{ p }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}&part={{ part_filter }}">{{ p }}</a>
         </li>
         {% else %}
         <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -110,7 +120,7 @@
         {% endfor %}
         {% if questions.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ questions.next_num }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}">»</a>
+            <a class="page-link" href="?page={{ questions.next_num }}&search={{ search }}&category={{ category_id }}&type={{ qtype }}&part={{ part_filter }}">»</a>
         </li>
         {% endif %}
     </ul>

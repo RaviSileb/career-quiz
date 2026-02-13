@@ -5,7 +5,7 @@
 <div class="text-center hero-section">
     <h1 class="display-4 mb-3"><i class="bi bi-mortarboard-fill text-primary"></i> Kariérní kvíz</h1>
     <p class="lead text-muted mb-4">
-        Odpověz na {{ total_questions }} otázek různých typů a zjisti, která kariéra ti nejlépe sedí.
+        Dvoudílný kvíz, který ti pomůže najít ideální kariéru i konkrétní povolání.
     </p>
     <a href="{{ url_for('quiz') }}" class="btn btn-primary btn-lg px-5 py-3">
         <i class="bi bi-play-fill"></i> Spustit kvíz
@@ -14,8 +14,42 @@
 
 <hr class="my-5">
 
+<!-- Jak to funguje -->
+<h3 class="text-center mb-4"><i class="bi bi-diagram-3"></i> Jak kvíz funguje</h3>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 text-center border-primary">
+            <div class="card-body">
+                <div class="fs-1 mb-2">1️⃣</div>
+                <h5 class="text-primary">Část 1: Kariérní směr</h5>
+                <p class="text-muted">{{ part1_setting }} otázek různých typů zjistí, které kariérní oblasti ti sedí nejvíc.</p>
+                <span class="badge bg-primary">{{ p1_count }} otázek v bance</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <div class="fs-1 mb-2">📊</div>
+                <h5>Mezivýsledky</h5>
+                <p class="text-muted">Uvidíš své 3 nejsilnější kariérní kategorie a postoupíš do druhé části.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center border-success">
+            <div class="card-body">
+                <div class="fs-1 mb-2">2️⃣</div>
+                <h5 class="text-success">Část 2: Konkrétní pozice</h5>
+                <p class="text-muted">{{ part2_setting }} otázek z tvých top kategorií pomohou najít konkrétní povolání.</p>
+                <span class="badge bg-success">{{ positions_count }} pozic k nalezení</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Typy otázek -->
-<h3 class="text-center mb-4"><i class="bi bi-list-check"></i> 8 typů otázek</h3>
+<h3 class="text-center mb-4"><i class="bi bi-list-check"></i> {{ type_counts|length }} typů otázek</h3>
 <div class="row g-3 mb-5">
     {% for label, count in type_counts.items() %}
     <div class="col-md-3 col-6">

@@ -3,15 +3,15 @@
 
 {% block content %}
 <div class="quiz-header text-center mb-4">
-    <h2><i class="bi bi-pencil-square"></i> Kariérní kvíz</h2>
-    <p class="text-muted">Odpověz na všech {{ total }} otázek a zjisti svou ideální kariéru.</p>
+    <h2><i class="bi bi-pencil-square"></i> Část 1: Kariérní směr</h2>
+    <p class="text-muted">Odpověz na {{ total }} otázek a zjisti, které kariérní oblasti ti sedí.</p>
     <div class="progress mb-3" style="height: 8px;">
         <div class="progress-bar bg-primary" id="progressBar" style="width: 0%"></div>
     </div>
     <small class="text-muted">Zodpovězeno: <span id="answeredCount">0</span> z {{ total }}</small>
 </div>
 
-<form method="POST" action="{{ url_for('submit') }}" id="quizForm">
+<form method="POST" action="{{ url_for('submit_part1') }}" id="quizForm">
     {% for question in questions %}
     <div class="question-card card mb-4" data-question="{{ loop.index }}" data-type="{{ question.question_type }}">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">

@@ -3,13 +3,18 @@
 
 {% block content %}
 <div class="text-center mb-4">
-    <h2><i class="bi bi-trophy-fill text-warning"></i> Výsledky kvízu</h2>
-    <p class="text-muted">Odpověděl/a jsi na {{ answered }} z {{ total }} otázek</p>
+    <h2><i class="bi bi-trophy-fill text-warning"></i> Výsledky kariérního kvízu</h2>
+    <p class="text-muted">
+        Část 1: {{ res.answered_count }}/{{ res.total_count }} otázek |
+        Část 2: {{ res.part2_answered }}/{{ res.part2_total }} otázek
+    </p>
 </div>
 
-<!-- Top 3 výsledky -->
+<!-- Top pozice -->
+{% if top_positions %}
+<h3 class="text-center mb-3"><i class="bi bi-star-fill text-warning"></i> Tvé nejvhodnější pozice</h3>
 <div class="row g-4 mb-5">
-    {% for r in top_results %}
+    {% for p in top_positions[:3] %}
     <div class="col-md-4">
         <div class="card h-100 {% if loop.index == 1 %}border-warning shadow-lg{% endif %}">
             <div class="card-body text-center">
@@ -20,12 +25,61 @@
                 {% else %}
                 <div class="fs-1 mb-2">🥉</div>
                 {% endif %}
-                <div class="fs-2 mb-2">{{ r.category.icon }}</div>
-                <h4 style="color: {{ r.category.color }};">{{ r.category.name }}</h4>
-                <p class="text-muted small">{{ r.category.description }}</p>
-                <div class="display-6 fw-bold" style="color: {{ r.category.color }};">
-                    {{ r.percentage }}%
+                <div class="fs-2 mb-2">{{ p.position.icon }}</div>
+                <h4>{{ p.position.name }}</h4>
+                <span class="badge mb-2" style="background-color: {{ p.category.color }};">
+                    {{ p.category.icon }} {{ p.category.name }}
+                </span>
+                <p class="text-muted small">{{ p.position.description }}</p>
+                <div class="display-6 fw-bold text-success">{{ p.score }} bodů</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Pozice po kategoriích -->
+{% if position_results_by_cat %}
+<h4 class="mb-3"><i class="bi bi-person-workspace"></i> Podrobnosti podle kategorií</h4>
+{% for cat, positions in position_results_by_cat.items() %}
+<div class="card mb-4">
+    <div class="card-header" style="border-left: 4px solid {{ cat.color }};">
+        <h5 class="mb-0">{{ cat.icon }} {{ cat.name }}</h5>
+    </div>
+    <div class="card-body">
+        {% for p in positions %}
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>{{ p.position.icon }} <strong>{{ p.position.name }}</strong></span>
+                <span class="badge" style="background-color: {{ cat.color }};">
+                    {{ p.score }} bodů ({{ p.percentage }}%)
+                </span>
+            </div>
+            <div class="progress" style="height: 20px;">
+                <div class="progress-bar" role="progressbar"
+                     style="width: {{ p.percentage }}%; background-color: {{ cat.color }};"
+                     aria-valuenow="{{ p.percentage }}" aria-valuemin="0" aria-valuemax="100">
                 </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Kategorie (Part 1) -->
+<h4 class="mb-3"><i class="bi bi-bar-chart"></i> Kariérní kategorie (Část 1)</h4>
+<div class="row g-4 mb-4">
+    {% for r in top_cat_results %}
+    <div class="col-md-4">
+        <div class="card h-100 {% if loop.index == 1 %}border-warning{% endif %}">
+            <div class="card-body text-center">
+                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+                <div class="fs-2 mb-2">{{ r.category.icon }}</div>
+                <h5 style="color: {{ r.category.color }};">{{ r.category.name }}</h5>
+                <div class="fs-4 fw-bold" style="color: {{ r.category.color }};">{{ r.percentage }}%</div>
                 <small class="text-muted">({{ r.score }} bodů)</small>
             </div>
         </div>
@@ -33,11 +87,10 @@
     {% endfor %}
 </div>
 
-<!-- Kompletní přehled -->
-<h4 class="mb-3">Kompletní přehled všech kategorií</h4>
-<div class="card">
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-list-ol"></i> Kompletní přehled kategorií</div>
     <div class="card-body">
-        {% for r in results %}
+        {% for r in category_results %}
         <div class="mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <span>{{ r.category.icon }} <strong>{{ r.category.name }}</strong></span>
