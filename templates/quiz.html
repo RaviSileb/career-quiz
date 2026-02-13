@@ -22,7 +22,6 @@
                 'true_false': 'success',
                 'likert': 'warning',
                 'short_answer': 'danger',
-                'fill_blank': 'secondary',
                 'matching': 'dark',
                 'ordering': 'purple'
             }.get(question.question_type, 'primary') }} text-white type-badge">
@@ -112,31 +111,6 @@
                        autocomplete="off">
             </div>
 
-            {# ═══════ FILL IN THE BLANK ═══════ #}
-            {% elif question.question_type == 'fill_blank' %}
-            {% set parts = question.text.split('____') %}
-            <h5 class="card-title mb-3">
-                {% if parts|length > 1 %}
-                    {{ parts[0] }}
-                    <span class="fill-blank-wrapper">
-                        <input type="text" class="form-control d-inline-block fill-blank-input quiz-input"
-                               name="question_{{ question.id }}"
-                               placeholder="..."
-                               autocomplete="off"
-                               style="width: 200px;">
-                    </span>
-                    {{ parts[1] }}
-                {% else %}
-                    {{ question.text }}
-                    <div class="mt-2">
-                        <input type="text" class="form-control quiz-input"
-                               name="question_{{ question.id }}"
-                               placeholder="Vaše odpověď..."
-                               autocomplete="off">
-                    </div>
-                {% endif %}
-            </h5>
-
             {# ═══════ MATCHING ═══════ #}
             {% elif question.question_type == 'matching' %}
             <h5 class="card-title mb-3">{{ question.text }}</h5>
@@ -219,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (card.querySelector('input[type="radio"]:checked')) answered++;
             } else if (type === 'multiple_choice') {
                 if (card.querySelector('input[type="checkbox"]:checked')) answered++;
-            } else if (type === 'short_answer' || type === 'fill_blank') {
+            } else if (type === 'short_answer') {
                 const inp = card.querySelector('input[type="text"]');
                 if (inp && inp.value.trim()) answered++;
             } else if (type === 'matching') {

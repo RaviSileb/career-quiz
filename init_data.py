@@ -1,8 +1,8 @@
 """
-150 kariérních otázek různých typů pro 11 kategorií.
+135 kariérních otázek různých typů pro 11 kategorií.
 
 Typy: single_choice, multiple_choice, true_false, likert,
-      short_answer, fill_blank, matching, ordering
+      short_answer, matching, ordering
 
 Kategorie (zkratky):
   ZEM - Zemědělství a lesnictví
@@ -103,18 +103,6 @@ def _short(text, keyword_groups, default_scores=None):
         'extra_data': {
             'keyword_groups': keyword_groups,
             'default_scores': default_scores or {}
-        }
-    }
-
-
-def _fill(text, accepted, correct_scores, wrong_scores=None):
-    """Fill in the blank."""
-    return {
-        'text': text, 'type': 'fill_blank',
-        'extra_data': {
-            'accepted': accepted,
-            'correct_scores': correct_scores,
-            'wrong_scores': wrong_scores or {}
         }
     }
 
@@ -769,55 +757,7 @@ def get_questions():
             {'keywords': ['fast food', 'burger', 'kebab'], 'scores': {'OBC': 2}},
         ]),
 
-        # ══════════════ FILL IN THE BLANK (114–128) ══════════════
-
-        # 114
-        _fill('Osoba, která navrhuje budovy, se nazývá ____.',
-              ['architekt', 'projektant'], {'STA': 3}),
-        # 115
-        _fill('Odborník na počítačové sítě se nazývá síťový ____.',
-              ['administrátor', 'správce', 'admin', 'technik', 'inženýr'], {'IT': 3}),
-        # 116
-        _fill('Léčivé přípravky připravuje a vydává ____.',
-              ['farmaceut', 'lékárník', 'lékárnice'], {'ZDR': 3}),
-        # 117
-        _fill('Osoba, která řídí letadlo, je ____.',
-              ['pilot', 'pilotka', 'letec'], {'DOP': 3}),
-        # 118
-        _fill('Umělec, který vytváří sochy, se nazývá ____.',
-              ['sochař', 'sochařka', 'skulptor'], {'UME': 3}),
-        # 119
-        _fill('Specialista na obdělávání půdy a pěstování plodin je ____.',
-              ['agronom', 'zemědělec', 'farmář', 'rolník'], {'ZEM': 3}),
-        # 120
-        _fill('Osoba zastupující klienta u soudu je ____.',
-              ['advokát', 'právník', 'obhájce', 'právnička'], {'PRA': 3}),
-        # 121
-        _fill('Pracovník, který svařuje kovové díly, je ____.',
-              ['svářeč', 'svářečka', 'zámečník'], {'STR': 3}),
-        # 122
-        _fill('Osoba, která vyučuje žáky ve škole, je ____.',
-              ['učitel', 'učitelka', 'pedagog', 'pedagožka', 'lektor'], {'SKO': 3}),
-        # 123
-        _fill('Řízení firmy a rozhodování o strategii má na starosti ____.',
-              ['manažer', 'ředitel', 'vedoucí', 'manažerka', 'ředitelka'], {'MAN': 3}),
-        # 124
-        _fill('Osoba, která připravuje jídla v restauraci, je ____.',
-              ['kuchař', 'kuchařka', 'šéfkuchař'], {'OBC': 3}),
-        # 125
-        _fill('Voda vře při ____ stupních Celsia.',
-              ['100', 'sto'], {'STR': 1, 'ZDR': 1}),
-        # 126
-        _fill('Hlavním městem České republiky je ____.',
-              ['praha'], {'PRA': 1, 'SKO': 1}),
-        # 127
-        _fill('Jednotka elektrického napětí se nazývá ____.',
-              ['volt', 'v'], {'STR': 3}),
-        # 128
-        _fill('Největší tepna v lidském těle se nazývá ____.',
-              ['aorta'], {'ZDR': 3}),
-
-        # ══════════════ MATCHING (129–140) ══════════════
+        # ══════════════ MATCHING (114–125) ══════════════
 
         # 129
         _match('Přiřaďte nástroje k profesím:', [
@@ -905,7 +845,7 @@ def get_questions():
             {'left': 'Profesní průkaz', 'right': 'Doprava', 'scores': {'DOP': 2}},
         ]),
 
-        # ══════════════ ORDERING (141–150) ══════════════
+        # ══════════════ ORDERING (126–135) ══════════════
 
         # 141
         _order('Seřaďte kroky vývoje softwaru od začátku:',

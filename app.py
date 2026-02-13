@@ -65,19 +65,6 @@ def score_question(question, form_data, cat_scores):
                     cat_scores[int(cid_s)] = cat_scores.get(int(cid_s), 0) + sv
             return True
 
-    elif qtype == 'fill_blank':
-        user_text = form_data.get(f'question_{qid}', '').strip().lower()
-        if user_text and question.extra_data:
-            data = question.extra_data_parsed
-            accepted = [a.lower() for a in data.get('accepted', [])]
-            if user_text in accepted:
-                for cid_s, sv in data.get('correct_scores', {}).items():
-                    cat_scores[int(cid_s)] = cat_scores.get(int(cid_s), 0) + sv
-            else:
-                for cid_s, sv in data.get('wrong_scores', {}).items():
-                    cat_scores[int(cid_s)] = cat_scores.get(int(cid_s), 0) + sv
-            return True
-
     elif qtype == 'matching':
         if question.extra_data:
             data = question.extra_data_parsed
@@ -148,10 +135,6 @@ def quiz():
             indexed = list(enumerate(items))
             random.shuffle(indexed)
             quiz_data[q.id] = {'shuffled_items': indexed}
-
-        elif q.question_type == 'fill_blank':
-            # Pro zobrazení textu s blankem
-            quiz_data[q.id] = {}
 
         elif q.question_type == 'likert' and q.extra_data:
             data = q.extra_data_parsed
@@ -471,22 +454,6 @@ def _parse_extra_data(form, qtype):
             idx += 1
         extra['keyword_groups'] = keyword_groups
         extra['default_scores'] = {}
-
-    elif qtype == 'fill_blank':
-        accepted = form.get('fill_accepted', '')
-        if accepted:
-            extra['accepted'] = [a.strip().lower() for a in accepted.split(',') if a.strip()]
-        extra['correct_scores'] = {}
-        extra['wrong_scores'] = {}
-        for key in form:
-            if key.startswith('fill_correct_score_'):
-                cat_id = key.replace('fill_correct_score_', '')
-                try:
-                    sv = int(form[key])
-                    if sv > 0:
-                        extra['correct_scores'][cat_id] = sv
-                except ValueError:
-                    pass
 
     return extra if extra else None
 

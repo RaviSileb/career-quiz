@@ -99,20 +99,6 @@ main { flex: 1; }
 }
 .btn-check:checked + .likert-btn .likert-label { color: rgba(255,255,255,0.85); }
 
-/* Fill in blank */
-.fill-blank-input {
-    border: none;
-    border-bottom: 2px solid #0d6efd;
-    border-radius: 0;
-    font-weight: bold;
-    text-align: center;
-    background: transparent;
-}
-.fill-blank-input:focus {
-    box-shadow: none;
-    border-bottom-color: #0a58ca;
-}
-
 /* Matching */
 .matching-row {
     padding: 0.5rem;

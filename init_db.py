@@ -83,19 +83,6 @@ def init_database():
                                     convert_scores(extra['default_scores'], cat_map).items()
                                 }
 
-                        # Fill blank – převést scores
-                        if qtype == 'fill_blank':
-                            if 'correct_scores' in extra:
-                                extra['correct_scores'] = {
-                                    str(k): v for k, v in
-                                    convert_scores(extra['correct_scores'], cat_map).items()
-                                }
-                            if 'wrong_scores' in extra:
-                                extra['wrong_scores'] = {
-                                    str(k): v for k, v in
-                                    convert_scores(extra['wrong_scores'], cat_map).items()
-                                }
-
                         extra_json = json.dumps(extra, ensure_ascii=False)
 
                     q = Question(

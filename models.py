@@ -12,7 +12,6 @@ QUESTION_TYPES = {
     'true_false': 'Pravda / Nepravda',
     'likert': 'Škálování (Likert)',
     'short_answer': 'Krátká odpověď',
-    'fill_blank': 'Doplňování',
     'matching': 'Přiřazování',
     'ordering': 'Seřazování',
 }
